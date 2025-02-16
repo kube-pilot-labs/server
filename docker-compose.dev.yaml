@@ -1,10 +1,61 @@
-version: '3'
+version: '3.8'
+
 services:
-  app:
+  server:
     build:
       context: .
       dockerfile: Dockerfile.dev
     image: kube-pilot-server
+    ports:
+      - "3000:3000"
     volumes:
       - .:/usr/src/app:delegated
       - /usr/src/app/node_modules
+      - ./wait-for-kafka.sh:/usr/local/bin/wait-for-kafka.sh
+    networks:
+      - app_network
+    depends_on:
+      - kafka
+      - zookeeper
+    restart: unless-stopped
+    entrypoint: [ "sh", "/usr/local/bin/wait-for-kafka.sh" ]
+    command: ["npm", "run", "start:dev"]
+
+  zookeeper:
+    image: bitnami/zookeeper:3.8.0
+    ports:
+      - "2181:2181"
+    environment:
+      ALLOW_ANONYMOUS_LOGIN: "yes"
+    networks:
+      - app_network
+    restart: unless-stopped
+
+  kafka:
+    image: bitnami/kafka:3.2.0
+    ports:
+      - "9092:9092"
+      - "9093:9093"
+    environment:
+      KAFKA_ADVERTISED_LISTENERS: INSIDE://kafka:9092,OUTSIDE://localhost:9093
+      KAFKA_INTER_BROKER_LISTENER_NAME: INSIDE
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: INSIDE:PLAINTEXT,OUTSIDE:PLAINTEXT
+      KAFKA_LISTENERS: INSIDE://0.0.0.0:9092,OUTSIDE://0.0.0.0:9093
+      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
+      ALLOW_PLAINTEXT_LISTENER: "yes"
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+    networks:
+      - app_network
+    depends_on:
+      - zookeeper
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "sh", "-c", "kafka-topics.sh --list --bootstrap-server localhost:9092 || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+networks:
+  app_network:
+    driver: bridge

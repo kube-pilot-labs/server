@@ -1,7 +1,9 @@
 import { Module } from '@nestjs/common';
 import { DeployController } from './deploy.controller';
+import { DeployService } from './deploy.service';
 
 @Module({
-  controllers: [DeployController],
+    controllers: [DeployController],
+    providers: [DeployService],
 })
 export class DeployModule {}

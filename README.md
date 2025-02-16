@@ -4,24 +4,17 @@
 
 Kube Pilot Server is a server that allows you to deploy your application to a Kubernetes cluster.
 
-## Build Image for Development
+## Build Docker Image for Development
 
 ```bash
-$ docker build -f Dockerfile.dev -t
-kube-pilot-server .
+$ docker-compose -f docker-compose.dev.yaml build
 ```
 
-## Running the app
+## Running the app in development mode
 
 ```bash
 # development
-$ npm run start
-
-# watch mode
-$ npm run start:dev
-
-# production mode
-$ npm run start:prod
+$ docker-compose -f docker-compose.dev.yaml up
 ```
 
 ## Test
