@@ -1,0 +1,10 @@
+version: '3'
+services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile.dev
+    image: kube-pilot-server
+    volumes:
+      - .:/usr/src/app:delegated
+      - /usr/src/app/node_modules

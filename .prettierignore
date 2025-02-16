@@ -1,0 +1,7 @@
+node_modules/
+build/
+**/*.min.js
+Dockerfile*
+*.yaml
+*.yml
+*.json
