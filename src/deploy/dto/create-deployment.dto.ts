@@ -3,7 +3,7 @@ import { IsString, IsNotEmpty, IsArray, ArrayNotEmpty, IsObject, IsNumber, Valid
 import { Type } from 'class-transformer';
 
 export class ContainerSpecDto {
-    @ApiProperty({ description: 'Container image name' })
+    @ApiProperty({ description: 'Container image path' })
     @IsString()
     @IsNotEmpty()
     image: string;
@@ -19,11 +19,11 @@ export class ContainerSpecDto {
     @IsString({ each: true })
     args: string[];
 
-    @ApiProperty({ description: 'Environment variables object', type: Object, additionalProperties: { type: 'string' } })
+    @ApiProperty({ description: 'Environment variables', type: Object, additionalProperties: { type: 'string' } })
     @IsObject()
     env: Record<string, string>;
 
-    @ApiProperty({ description: 'Port number to be used', type: Number })
+    @ApiProperty({ description: 'Port number', type: Number })
     @IsNumber()
     @Min(0)
     port: number;
@@ -40,12 +40,12 @@ export class ResourceLimitsDto {
 }
 
 export class ResourcesDto {
-    @ApiProperty({ description: 'Requested resource limits', type: ResourceLimitsDto })
+    @ApiProperty({ description: 'Resource limits', type: ResourceLimitsDto })
     @ValidateNested()
     @Type(() => ResourceLimitsDto)
     requests: ResourceLimitsDto;
 
-    @ApiProperty({ description: 'Maximum resource limits', type: ResourceLimitsDto })
+    @ApiProperty({ description: 'Resource limits', type: ResourceLimitsDto })
     @ValidateNested()
     @Type(() => ResourceLimitsDto)
     limits: ResourceLimitsDto;
@@ -57,17 +57,17 @@ export class CreateDeploymentDto {
     @IsNotEmpty()
     deployName: string;
 
-    @ApiProperty({ description: 'Namespace name' })
+    @ApiProperty({ description: 'Namespace' })
     @IsString()
     @IsNotEmpty()
     namespace: string;
 
-    @ApiProperty({ description: 'Container specifications', type: ContainerSpecDto })
+    @ApiProperty({ description: 'Container spec', type: ContainerSpecDto })
     @ValidateNested()
     @Type(() => ContainerSpecDto)
     containerSpec: ContainerSpecDto;
 
-    @ApiProperty({ description: 'Resource information', type: ResourcesDto })
+    @ApiProperty({ description: 'Resources', type: ResourcesDto })
     @ValidateNested()
     @Type(() => ResourcesDto)
     resources: ResourcesDto;
