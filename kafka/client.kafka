@@ -1,4 +1,0 @@
-CONSUMER consumer-group-id
-topic: deployment-commands
-partitions: 0
-from: 4

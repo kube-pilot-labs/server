@@ -1,28 +1,26 @@
 import { Injectable, OnModuleInit } from '@nestjs/common';
-import { ClientKafka, Client, Transport } from '@nestjs/microservices';
+import { ClientKafka, Transport } from '@nestjs/microservices';
+import { KafkaConfigService } from './kafka-config.service';
 
 @Injectable()
 export class DeployService implements OnModuleInit {
-    @Client({
-        transport: Transport.KAFKA,
-        options: {
-            client: {
-                clientId: 'deploy-producer',
-                brokers: ['kafka:9092'],
-            },
-            consumer: {
-                groupId: 'deploy-consumer',
-            },
-        },
-    })
-    client: ClientKafka;
+    private client: ClientKafka;
+
+    constructor(private readonly kafkaConfig: KafkaConfigService) {}
 
     async onModuleInit() {
+        this.client = new ClientKafka({
+            client: {
+                clientId: this.kafkaConfig.clientId,
+                brokers: [this.kafkaConfig.broker],
+            },
+        });
+
         await this.client.connect();
     }
 
     publishDeploymentCommand(payload: any) {
         const deploymentId = payload.deployment_id;
-        this.client.emit('deployment-commands', { key: deploymentId, value: payload });
+        this.client.emit(this.kafkaConfig.topic, { key: deploymentId, value: payload });
     }
 }

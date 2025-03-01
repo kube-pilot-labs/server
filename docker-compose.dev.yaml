@@ -12,6 +12,10 @@ services:
       - .:/usr/src/app:delegated
       - /usr/src/app/node_modules
       - ./wait-for-kafka.sh:/usr/local/bin/wait-for-kafka.sh
+    environment:
+      KAFKA_BROKER: ${KAFKA_BROKER}
+      KAFKA_CLIENT_ID: ${KAFKA_CLIENT_ID}
+      KAFKA_TOPIC: ${KAFKA_TOPIC}
     networks:
       - app_network
     depends_on:
