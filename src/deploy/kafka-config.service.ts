@@ -10,11 +10,6 @@ export class KafkaConfigService extends AbstractConfigService<KafkaConfigService
     @IsNotEmpty()
     broker: string;
 
-    @Expose({ name: 'KAFKA_CLIENT_ID' })
-    @IsString()
-    @IsNotEmpty()
-    clientId: string;
-
     @Expose({ name: 'KAFKA_TOPIC' })
     @IsString()
     @IsNotEmpty()

@@ -11,7 +11,6 @@ export class DeployService implements OnModuleInit {
     async onModuleInit() {
         this.client = new ClientKafka({
             client: {
-                clientId: this.kafkaConfig.clientId,
                 brokers: [this.kafkaConfig.broker],
             },
         });
