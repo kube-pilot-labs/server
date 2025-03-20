@@ -20,6 +20,6 @@ export class DeployService implements OnModuleInit {
 
     publishDeploymentCommand(payload: any) {
         const deploymentId = payload.deployment_id;
-        this.client.emit(this.kafkaConfig.topic, { key: deploymentId, value: payload });
+        this.client.emit(this.kafkaConfig.createDeployTopic, { key: deploymentId, value: payload });
     }
 }

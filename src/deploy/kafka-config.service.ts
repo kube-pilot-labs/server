@@ -10,8 +10,8 @@ export class KafkaConfigService extends AbstractConfigService<KafkaConfigService
     @IsNotEmpty()
     broker: string;
 
-    @Expose({ name: 'KAFKA_TOPIC' })
+    @Expose({ name: 'KAFKA_CREATE_DEPLOY_TOPIC' })
     @IsString()
     @IsNotEmpty()
-    topic: string;
+    createDeployTopic: string;
 }
