@@ -14,6 +14,19 @@ async function bootstrap() {
     const document = SwaggerModule.createDocument(app, config);
     SwaggerModule.setup('api-docs', app, document);
 
+    const terminationSignals = ['SIGTERM', 'SIGINT'];
+    for (const signal of terminationSignals) {
+        process.on(signal, async () => {
+            try {
+                await app.close();
+                process.exit(0);
+            } catch (error) {
+                console.error(error);
+                process.exit(1);
+            }
+        });
+    }
+
     await app.listen(3000);
 }
 bootstrap();
