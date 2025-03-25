@@ -8,5 +8,6 @@ import { ConfigModule } from '@nestjs-library/config';
     imports: [ConfigModule.forFeature(KafkaConfigService)],
     controllers: [DeployController],
     providers: [DeployService],
+    exports: [DeployService],
 })
 export class DeployModule {}
