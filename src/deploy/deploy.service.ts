@@ -36,7 +36,7 @@ export class DeployService implements OnModuleInit, OnApplicationShutdown {
         let subscription: Subscription = null;
         try {
             return await new Promise<boolean>((resolve, reject) => {
-                subscription = this.client.emit('__kafka_health_check', {}).subscribe({
+                subscription = this.client.emit('__healthcheck', {}).subscribe({
                     next: () => {
                         resolve(true);
                     },
