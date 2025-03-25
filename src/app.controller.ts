@@ -1,22 +1,49 @@
-import { Controller, Get } from '@nestjs/common';
+import { Controller, Get, HttpException, HttpStatus } from '@nestjs/common';
 import { AppService } from './app.service';
 import { ApiTags, ApiResponse } from '@nestjs/swagger';
+import { DeployService } from './deploy/deploy.service';
 
 @ApiTags('App')
 @Controller()
 export class AppController {
-    constructor(private readonly appService: AppService) {}
+    constructor(
+        private readonly appService: AppService,
+        private readonly deployService: DeployService,
+    ) {}
+
+    @Get('/ping')
+    @ApiResponse({
+        status: 200,
+        description: 'Liveness Check',
+        schema: {
+            type: 'object',
+            properties: {
+                status: { type: 'string', example: 'ok' },
+            },
+        },
+    })
+    getLiveness(): { status: string } {
+        return { status: 'ok' };
+    }
 
     @Get('/healthz')
     @ApiResponse({
         status: 200,
         description: 'Health Check',
         schema: {
-            type: 'string',
-            example: 'pong',
+            type: 'object',
+            properties: {
+                status: { type: 'string', example: 'ok' },
+            },
         },
     })
-    getHello(): string {
-        return 'ok';
+    async getHello(): Promise<{ status: string }> {
+        const kafkaStatus = await this.deployService.isConnected();
+        if (!kafkaStatus) {
+            throw new HttpException({ status: 'unhealthy' }, HttpStatus.SERVICE_UNAVAILABLE);
+        }
+        return {
+            status: 'ok',
+        };
     }
 }

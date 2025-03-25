@@ -25,6 +25,34 @@ export class DeployService implements OnModuleInit, OnApplicationShutdown {
         }
     }
 
+    async isConnected(): Promise<boolean> {
+        try {
+            if (!this.client) {
+                return false;
+            }
+
+            await this.client.connect();
+            const isConnected = await new Promise<boolean>((resolve) => {
+                try {
+                    this.client.emit('__kafka_health_check', {}).subscribe({
+                        next: () => resolve(true),
+                        error: () => resolve(false),
+                        complete: () => {},
+                    });
+
+                    setTimeout(() => resolve(false), 3000);
+                } catch (e) {
+                    resolve(false);
+                }
+            });
+
+            return isConnected;
+        } catch (error) {
+            console.error('Kafka connection check failed:', error);
+            return false;
+        }
+    }
+
     publishDeploymentCommand(payload: any) {
         const deploymentId = payload.deployment_id;
         this.client.emit(this.kafkaConfig.createDeployTopic, { key: deploymentId, value: payload });
