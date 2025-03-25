@@ -1,6 +1,8 @@
 import { Injectable, OnModuleInit, OnApplicationShutdown } from '@nestjs/common';
 import { ClientKafka, Transport } from '@nestjs/microservices';
 import { KafkaConfigService } from './kafka-config.service';
+import { Subscription } from 'rxjs';
+import { Observable } from 'rxjs';
 
 @Injectable()
 export class DeployService implements OnModuleInit, OnApplicationShutdown {
@@ -26,30 +28,37 @@ export class DeployService implements OnModuleInit, OnApplicationShutdown {
     }
 
     async isConnected(): Promise<boolean> {
+        if (!this.client) {
+            return false;
+        }
+
+        let timerId: NodeJS.Timeout = null;
+        let subscription: Subscription = null;
         try {
-            if (!this.client) {
-                return false;
-            }
+            return await new Promise<boolean>((resolve, reject) => {
+                subscription = this.client.emit('__kafka_health_check', {}).subscribe({
+                    next: () => {
+                        resolve(true);
+                    },
+                    error: (e) => {
+                        reject(e);
+                    },
+                });
 
-            await this.client.connect();
-            const isConnected = await new Promise<boolean>((resolve) => {
-                try {
-                    this.client.emit('__kafka_health_check', {}).subscribe({
-                        next: () => resolve(true),
-                        error: () => resolve(false),
-                        complete: () => {},
-                    });
-
-                    setTimeout(() => resolve(false), 3000);
-                } catch (e) {
-                    resolve(false);
-                }
+                timerId = setTimeout(() => {
+                    reject(new Error('Kafka health check timeout'));
+                }, 3000);
             });
-
-            return isConnected;
         } catch (error) {
             console.error('Kafka connection check failed:', error);
             return false;
+        } finally {
+            if (timerId) {
+                clearTimeout(timerId);
+            }
+            if (subscription) {
+                subscription.unsubscribe();
+            }
         }
     }
 
