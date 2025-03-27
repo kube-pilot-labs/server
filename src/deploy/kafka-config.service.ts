@@ -14,4 +14,9 @@ export class KafkaConfigService extends AbstractConfigService<KafkaConfigService
     @IsString()
     @IsNotEmpty()
     createDeployTopic: string;
+
+    @Expose({ name: 'KAFKA_HEALTH_CHECK_TOPIC' })
+    @IsString()
+    @IsNotEmpty()
+    healthCheckTopic: string;
 }
