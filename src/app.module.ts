@@ -4,7 +4,7 @@ import { AppService } from './app.service';
 import { DeployModule } from './deploy/deploy.module';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { ConfigModule } from '@nestjs-library/config';
-import { MariaDBConfigService } from './typeorm-config.service';
+import { MariaDBConfigService } from './mariadb-config.service';
 @Module({
     imports: [
         ConfigModule.forFeature(MariaDBConfigService),
