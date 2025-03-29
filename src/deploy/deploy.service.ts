@@ -2,13 +2,19 @@ import { Injectable, OnModuleInit, OnApplicationShutdown } from '@nestjs/common'
 import { ClientKafka, Transport } from '@nestjs/microservices';
 import { KafkaConfigService } from './kafka-config.service';
 import { Subscription } from 'rxjs';
-import { Observable } from 'rxjs';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
+import { Deployment } from './entities/deployment.entity';
 
 @Injectable()
 export class DeployService implements OnModuleInit, OnApplicationShutdown {
     private client: ClientKafka;
 
-    constructor(private readonly kafkaConfig: KafkaConfigService) {}
+    constructor(
+        private readonly kafkaConfig: KafkaConfigService,
+        @InjectRepository(Deployment)
+        private deploymentRepository: Repository<Deployment>,
+    ) {}
 
     async onModuleInit() {
         this.client = new ClientKafka({
@@ -62,8 +68,13 @@ export class DeployService implements OnModuleInit, OnApplicationShutdown {
         }
     }
 
-    publishDeploymentCommand(payload: any) {
+    async publishDeploymentCommand(payload: any) {
         const deploymentId = payload.deployment_id;
         this.client.emit(this.kafkaConfig.createDeployTopic, { key: deploymentId, value: payload });
+        await this.deploymentRepository.save({
+            id: deploymentId,
+            name: payload.name,
+            status: 'pending',
+        });
     }
 }
