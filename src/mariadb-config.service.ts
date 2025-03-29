@@ -1,6 +1,6 @@
 import { AbstractConfigService } from '@nestjs-library/config';
 import { Injectable } from '@nestjs/common';
-import { Expose } from 'class-transformer';
+import { Expose, Transform } from 'class-transformer';
 import { IsBoolean, IsNotEmpty, IsNumber, IsString } from 'class-validator';
 
 @Injectable()
@@ -13,6 +13,7 @@ export class MariaDBConfigService extends AbstractConfigService<MariaDBConfigSer
     @Expose({ name: 'DB_PORT' })
     @IsNumber()
     @IsNotEmpty()
+    @Transform(({ value }) => parseInt(value))
     port: number;
 
     @Expose({ name: 'DB_USERNAME' })
@@ -33,5 +34,6 @@ export class MariaDBConfigService extends AbstractConfigService<MariaDBConfigSer
     @Expose({ name: 'DB_SYNC' })
     @IsBoolean()
     @IsNotEmpty()
+    @Transform(({ value }) => value === 'true')
     synchronize: boolean;
 }
