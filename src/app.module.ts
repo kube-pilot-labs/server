@@ -7,7 +7,9 @@ import { ConfigModule } from '@nestjs-library/config';
 import { MariaDBConfigService } from './mariadb-config.service';
 @Module({
     imports: [
-        ConfigModule.forFeature(MariaDBConfigService),
+        ConfigModule.forFeature(MariaDBConfigService, {
+            global: true,
+        }),
         TypeOrmModule.forRootAsync({
             imports: [ConfigModule],
             inject: [MariaDBConfigService],
