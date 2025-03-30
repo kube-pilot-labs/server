@@ -8,12 +8,12 @@ import { KafkaService } from './kafka.service';
 
 @Module({
     imports: [
-        ConfigModule.forFeature(KafkaConfigService),
+        ConfigModule.forFeature(KafkaConfigService, {
+            global: true,
+        }),
         ClientsModule.registerAsync([
             {
                 name: KAFKA_PRODUCER,
-                imports: [ConfigModule],
-                inject: [KafkaConfigService],
                 useFactory: (configService: KafkaConfigService) => ({
                     transport: Transport.KAFKA,
                     options: {
@@ -22,6 +22,7 @@ import { KafkaService } from './kafka.service';
                         },
                     },
                 }),
+                inject: [KafkaConfigService],
             },
         ]),
     ],
