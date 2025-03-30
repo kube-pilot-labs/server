@@ -1,6 +1,5 @@
-import { Global, Module, OnApplicationShutdown, OnModuleInit } from '@nestjs/common';
+import { Module, OnApplicationShutdown, OnModuleInit, Inject } from '@nestjs/common';
 import { ClientKafka, ClientsModule, Transport } from '@nestjs/microservices';
-import { ModuleRef } from '@nestjs/core';
 import { ConfigModule } from '@nestjs-library/config';
 import { KAFKA_PRODUCER } from './kafka.symbol';
 import { KafkaConfigService } from './kafka-config.service';
@@ -34,16 +33,14 @@ const configModule = ConfigModule.forFeature(KafkaConfigService);
     exports: [KafkaService],
 })
 export class KafkaModule implements OnApplicationShutdown, OnModuleInit {
-    constructor(private readonly moduleRef: ModuleRef) {}
+    constructor(@Inject(KAFKA_PRODUCER) private readonly kafkaProducer: ClientKafka) {}
 
     async onModuleInit() {
-        const kafkaProducer = this.moduleRef.get<ClientKafka>(KAFKA_PRODUCER);
-        await kafkaProducer.connect();
+        await this.kafkaProducer.connect();
     }
 
     async onApplicationShutdown() {
-        const kafkaProducer = this.moduleRef.get<ClientKafka>(KAFKA_PRODUCER);
-        await kafkaProducer.close();
+        await this.kafkaProducer.close();
         console.log('Kafka producer connection closed');
     }
 }
