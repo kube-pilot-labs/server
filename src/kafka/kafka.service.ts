@@ -1,15 +1,15 @@
 import { Inject, Injectable } from '@nestjs/common';
 import { ClientKafka } from '@nestjs/microservices';
 import { KAFKA_PRODUCER } from './kafka.symbol';
-import { KafkaConfigService } from './kafka-config.service';
 import { Subscription } from 'rxjs';
+import { HealthCheckConfigService } from './health-check-config.service';
 
 @Injectable()
 export class KafkaService {
     constructor(
         @Inject(KAFKA_PRODUCER)
         private readonly kafkaProducer: ClientKafka,
-        private readonly kafkaConfigService: KafkaConfigService,
+        private readonly healthCheckConfigService: HealthCheckConfigService,
     ) {}
 
     async isConnected(): Promise<boolean> {
@@ -21,7 +21,7 @@ export class KafkaService {
         let subscription: Subscription = null;
         try {
             return await new Promise<boolean>((resolve, reject) => {
-                subscription = this.kafkaProducer.emit(this.kafkaConfigService.healthCheckTopic, {}).subscribe({
+                subscription = this.kafkaProducer.emit(this.healthCheckConfigService.healthCheckTopic, {}).subscribe({
                     next: () => {
                         resolve(true);
                     },

@@ -9,12 +9,8 @@ import { KafkaModule } from './kafka/kafka.module';
 
 @Module({
     imports: [
-        ConfigModule.forFeature(MariaDBConfigService, {
-            global: true,
-        }),
         TypeOrmModule.forRootAsync({
-            imports: [ConfigModule],
-            inject: [MariaDBConfigService],
+            imports: [ConfigModule.forFeature(MariaDBConfigService)],
             useFactory: (configService: MariaDBConfigService) => ({
                 type: 'mariadb',
                 host: configService.host,
@@ -25,6 +21,7 @@ import { KafkaModule } from './kafka/kafka.module';
                 entities: [__dirname + '/**/*.entity{.ts,.js}'],
                 synchronize: configService.synchronize,
             }),
+            inject: [MariaDBConfigService],
         }),
         KafkaModule,
         DeployModule,

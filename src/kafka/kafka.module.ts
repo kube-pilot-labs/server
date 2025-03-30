@@ -4,33 +4,29 @@ import { ConfigModule } from '@nestjs-library/config';
 import { KAFKA_PRODUCER } from './kafka.symbol';
 import { KafkaConfigService } from './kafka-config.service';
 import { KafkaService } from './kafka.service';
-
-const configModule = ConfigModule.forFeature(KafkaConfigService);
+import { HealthCheckConfigService } from './health-check-config.service';
 
 @Module({
     imports: [
-        configModule,
-        ClientsModule.registerAsync({
-            clients: [
-                {
-                    name: KAFKA_PRODUCER,
-                    imports: [configModule],
-                    useFactory: (configService: KafkaConfigService) => ({
-                        transport: Transport.KAFKA,
-                        options: {
-                            client: {
-                                brokers: [configService.broker],
-                            },
+        ClientsModule.registerAsync([
+            {
+                name: KAFKA_PRODUCER,
+                imports: [ConfigModule.forFeature(KafkaConfigService)],
+                useFactory: (configService: KafkaConfigService) => ({
+                    transport: Transport.KAFKA,
+                    options: {
+                        client: {
+                            brokers: [configService.broker],
                         },
-                    }),
-                    inject: [KafkaConfigService],
-                },
-            ],
-            isGlobal: true,
-        }),
+                    },
+                }),
+                inject: [KafkaConfigService],
+            },
+        ]),
+        ConfigModule.forFeature(HealthCheckConfigService),
     ],
-    providers: [KafkaConfigService, KafkaService],
-    exports: [KafkaService],
+    providers: [KafkaService],
+    exports: [KafkaService, ClientsModule],
 })
 export class KafkaModule implements OnApplicationShutdown, OnModuleInit {
     constructor(@Inject(KAFKA_PRODUCER) private readonly kafkaProducer: ClientKafka) {}

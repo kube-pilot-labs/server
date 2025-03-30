@@ -4,9 +4,9 @@ import { Expose } from 'class-transformer';
 import { IsNotEmpty, IsString } from 'class-validator';
 
 @Injectable()
-export class KafkaConfigService extends AbstractConfigService<KafkaConfigService> {
-    @Expose({ name: 'KAFKA_BROKER' })
+export class HealthCheckConfigService extends AbstractConfigService<HealthCheckConfigService> {
+    @Expose({ name: 'KAFKA_HEALTH_CHECK_TOPIC' })
     @IsString()
     @IsNotEmpty()
-    broker: string;
+    healthCheckTopic: string;
 }
