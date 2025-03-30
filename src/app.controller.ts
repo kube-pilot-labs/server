@@ -37,9 +37,9 @@ export class AppController {
             },
         },
     })
-    async getHello(): Promise<{ status: string }> {
-        const kafkaStatus = await this.deployService.isConnected();
-        if (!kafkaStatus) {
+    async healthCheck(): Promise<{ status: string }> {
+        const isHealthy = await this.appService.healthCheck();
+        if (!isHealthy) {
             throw new HttpException({ status: 'unhealthy' }, HttpStatus.SERVICE_UNAVAILABLE);
         }
         return {

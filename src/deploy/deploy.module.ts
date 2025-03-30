@@ -1,13 +1,14 @@
 import { Module } from '@nestjs/common';
 import { DeployController } from './deploy.controller';
 import { DeployService } from './deploy.service';
-import { KafkaConfigService } from './kafka-config.service';
 import { ConfigModule } from '@nestjs-library/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { Deployment } from './entities/deployment.entity';
+import { DeployConfigService } from './deploy-config.service';
+import { KafkaModule } from '../kafka/kafka.module';
 
 @Module({
-    imports: [ConfigModule.forFeature(KafkaConfigService), TypeOrmModule.forFeature([Deployment])],
+    imports: [ConfigModule.forFeature(DeployConfigService), TypeOrmModule.forFeature([Deployment]), KafkaModule],
     controllers: [DeployController],
     providers: [DeployService],
     exports: [DeployService],
