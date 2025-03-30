@@ -7,26 +7,31 @@ import { KafkaConfigService } from './kafka-config.service';
 import { KafkaService } from './kafka.service';
 
 const configModule = ConfigModule.forFeature(KafkaConfigService);
-const kafkaClientsModule = ClientsModule.registerAsync([
-    {
-        name: KAFKA_PRODUCER,
-        useFactory: (configService: KafkaConfigService) => ({
-            transport: Transport.KAFKA,
-            options: {
-                client: {
-                    brokers: [configService.broker],
-                },
-            },
-        }),
-        inject: [KafkaConfigService],
-        imports: [configModule],
-    },
-]);
 
 @Module({
-    imports: [configModule, kafkaClientsModule],
+    imports: [
+        configModule,
+        ClientsModule.registerAsync({
+            clients: [
+                {
+                    name: KAFKA_PRODUCER,
+                    imports: [configModule],
+                    useFactory: (configService: KafkaConfigService) => ({
+                        transport: Transport.KAFKA,
+                        options: {
+                            client: {
+                                brokers: [configService.broker],
+                            },
+                        },
+                    }),
+                    inject: [KafkaConfigService],
+                },
+            ],
+            isGlobal: true,
+        }),
+    ],
     providers: [KafkaConfigService, KafkaService],
-    exports: [KafkaService, kafkaClientsModule],
+    exports: [KafkaService],
 })
 export class KafkaModule implements OnApplicationShutdown, OnModuleInit {
     constructor(private readonly moduleRef: ModuleRef) {}
