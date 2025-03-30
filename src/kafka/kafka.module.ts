@@ -27,7 +27,7 @@ import { KafkaService } from './kafka.service';
         ]),
     ],
     providers: [KafkaConfigService, KafkaService],
-    exports: [KafkaService, ClientsModule],
+    exports: [KafkaService, KAFKA_PRODUCER],
 })
 export class KafkaModule implements OnApplicationShutdown, OnModuleInit {
     constructor(private readonly moduleRef: ModuleRef) {}
