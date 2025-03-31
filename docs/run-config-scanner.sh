@@ -1,0 +1,1 @@
+npx ts-node docs/run-config-scanner.ts ./src ./docs/
